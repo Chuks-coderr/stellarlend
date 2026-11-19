@@ -1,0 +1,54 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "StellarLend: build contracts",
+      "type": "shell",
+      "command": "stellar contract build",
+      "options": {
+        "cwd": "${workspaceFolder}/stellar-lend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "StellarLend: test contracts",
+      "type": "shell",
+      "command": "cargo test --workspace",
+      "options": {
+        "cwd": "${workspaceFolder}/stellar-lend"
+      },
+      "group": "test",
+      "problemMatcher": [
+        "$rustc"
+      ]
+    },
+    {
+      "label": "StellarLend: devnet bootstrap",
+      "type": "shell",
+      "command": "bash scripts/devnet/bootstrap.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "StellarLend: deploy contracts (local)",
+      "type": "shell",
+      "command": "bash scripts/devnet/bootstrap.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "StellarLend: regenerate TypeScript bindings",
+      "type": "shell",
+      "command": "bash scripts/abi-extractor/extract.sh && node scripts/abi-extractor/generate-types.js",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

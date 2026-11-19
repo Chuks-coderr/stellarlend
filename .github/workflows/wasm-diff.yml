@@ -1,0 +1,41 @@
+name: Soroban WASM binary diff
+on:
+  pull_request:
+    paths:
+      - 'stellar-lend/**'
+      - '.github/workflows/wasm-diff.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  wasm-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+      - name: Install Stellar CLI
+        run: cargo install --locked stellar-cli
+      - name: Build base artifacts
+        run: |
+          git worktree add /tmp/stellarlend-base "${{ github.event.pull_request.base.sha || github.sha }}"
+          (cd /tmp/stellarlend-base/stellar-lend && stellar contract build)
+      - name: Build proposed artifacts
+        run: cd stellar-lend && stellar contract build
+      - name: Compare artifacts
+        run: |
+          node scripts/wasm-diff/compare.mjs \
+            /tmp/stellarlend-base/stellar-lend/target/wasm32v1-none/release \
+            stellar-lend/target/wasm32v1-none/release \
+            | tee wasm-diff.md
+          cat wasm-diff.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload diff
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-diff
+          path: wasm-diff.md
